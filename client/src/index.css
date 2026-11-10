@@ -21,4 +21,13 @@ select { padding: .6rem; border: 1px solid #ccc; border-radius: 6px; font-size: 
 button.small { padding: .3rem .7rem; font-size: .85rem; margin-left: .3rem; }
 button.danger { background: #888; }
 button.secondary { background: #eee; color: #333; }
+.bar { flex-wrap: wrap; gap: .5rem; }
+.bar nav { display: flex; gap: 1rem; }
+.bar nav a { color: #555; text-decoration: none; }
+.bar nav a.active { color: #d6336c; font-weight: 600; }
+.muted { color: #777; margin: 0 0 .8rem; font-size: .9rem; }
+.empty { color: #777; font-style: italic; }
+.stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: .6rem; }
+.stats div { background: #f8f9fc; border-radius: 8px; padding: .6rem; display: grid; gap: .2rem; }
+.stats span { font-size: .8rem; color: #777; }
 button.link { background: none; color: #d6336c; padding: 0; text-decoration: underline; }

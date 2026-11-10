@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useAuth } from '../AuthContext.jsx';
+import Header from '../components/Header.jsx';
 import { api } from '../api.js';
 import { SLOTS, slotLabel, todayInIndia, validateReading } from '../readings.js';
 
 const emptyForm = (date) => ({ id: null, date, slot: 'morning', value: '' });
 
 export default function Home() {
-  const { user, logout } = useAuth();
   const today = todayInIndia();
   const [viewDate, setViewDate] = useState(today);
   const [readings, setReadings] = useState([]);
@@ -73,12 +72,7 @@ export default function Home() {
 
   return (
     <div className="page">
-      <header className="bar">
-        <h1>Sweety</h1>
-        <span>
-          {user.name} <button className="link" onClick={logout}>Log out</button>
-        </span>
-      </header>
+      <Header />
 
       <section className="card wide">
         <label>
