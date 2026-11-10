@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import Header from '../components/Header.jsx';
+import MonthChart from '../components/MonthChart.jsx';
 import { api } from '../api.js';
 import { slotLabel, todayInIndia } from '../readings.js';
 
@@ -71,6 +72,7 @@ export default function Reports() {
           </ReportCard>
           <ReportCard title="Month-to-date" report={data.monthToDate} />
           <ReportCard title="Monthly (previous month)" report={data.monthly} />
+          <MonthChart chart={data.chart} />
         </>
       )}
     </div>

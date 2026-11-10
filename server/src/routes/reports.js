@@ -42,7 +42,9 @@ router.get('/', async (req, res) => {
   if (date > todayInIndia()) return res.status(400).json({ error: 'Date cannot be in the future.' });
 
   const r = ranges(date);
-  const [daily, monthToDate, monthly, list] = await Promise.all([
+  const [y, m] = date.split('-').map(Number);
+  const monthEnd = toISO(new Date(Date.UTC(y, m, 0))); // last day of the selected month
+  const [daily, monthToDate, monthly, list, chart] = await Promise.all([
     stats(req.userId, r.daily),
     stats(req.userId, r.monthToDate),
     stats(req.userId, r.monthly),
@@ -52,9 +54,14 @@ router.get('/', async (req, res) => {
        ORDER BY array_position(ARRAY['morning','after_breakfast','after_lunch','after_dinner'], slot)`,
       [req.userId, date]
     ),
+    pool.query(
+      `SELECT reading_date AS date, slot, ROUND(value, 1) AS value FROM readings
+       WHERE user_id = $1 AND reading_date BETWEEN $2 AND $3`,
+      [req.userId, r.monthToDate[0], monthEnd]
+    ),
   ]);
   daily.readings = list.rows;
-  res.json({ daily, monthToDate, monthly });
+  res.json({ daily, monthToDate, monthly, chart: { from: r.monthToDate[0], to: monthEnd, readings: chart.rows } });
 });
 
 export default router;
