@@ -49,9 +49,14 @@ async function checkDayRules(userId, { date, slot }, excludeId = 0) {
 
 const COLUMNS = 'id, reading_date AS date, slot, value';
 
-// GET /api/readings?date=YYYY-MM-DD
+// '5' -> 5, missing -> default, anything else -> NaN
+const intParam = (v, def) => (v === undefined ? def : /^\d+$/.test(v) ? Number(v) : NaN);
+
+// GET /api/readings?date=YYYY-MM-DD   -> readings for one day
+// GET /api/readings?page=1&limit=20   -> all readings, newest first, one page at a time
 router.get('/', async (req, res) => {
   const { date } = req.query;
+  if (date === undefined) return listPage(req, res);
   if (!isValidDate(date)) return res.status(400).json({ error: 'Please choose a valid date.' });
   const { rows } = await pool.query(
     `SELECT ${COLUMNS} FROM readings WHERE user_id = $1 AND reading_date = $2`,
@@ -60,6 +65,30 @@ router.get('/', async (req, res) => {
   rows.sort((a, b) => SLOT_ORDER.indexOf(a.slot) - SLOT_ORDER.indexOf(b.slot));
   res.json({ readings: rows });
 });
+
+async function listPage(req, res) {
+  const page = intParam(req.query.page, 1);
+  const limit = intParam(req.query.limit, 20);
+  if (!(page >= 1)) return res.status(400).json({ error: 'page must be a whole number of 1 or more.' });
+  if (!(limit >= 1 && limit <= 100)) return res.status(400).json({ error: 'limit must be a whole number from 1 to 100.' });
+
+  const [list, total] = await Promise.all([
+    pool.query(
+      `SELECT ${COLUMNS} FROM readings
+       WHERE user_id = $1
+       ORDER BY reading_date DESC,
+                array_position(ARRAY['morning','after_breakfast','after_lunch','after_dinner'], slot) DESC
+       LIMIT $2 OFFSET $3`,
+      [req.userId, limit, (page - 1) * limit]
+    ),
+    pool.query('SELECT COUNT(*)::int AS n FROM readings WHERE user_id = $1', [req.userId]),
+  ]);
+  const count = total.rows[0].n;
+  res.json({
+    readings: list.rows,
+    pagination: { page, limit, total: count, totalPages: Math.ceil(count / limit) },
+  });
+}
 
 router.post('/', async (req, res) => {
   const { error, reading } = parseReading(req.body);

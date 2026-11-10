@@ -8,6 +8,7 @@ export default function Header() {
       <h1>Sweety</h1>
       <nav>
         <NavLink to="/" end>Readings</NavLink>
+        <NavLink to="/history">History</NavLink>
         <NavLink to="/reports">Reports</NavLink>
       </nav>
       <span>

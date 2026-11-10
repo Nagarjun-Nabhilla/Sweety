@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import Header from '../components/Header.jsx';
 import { api } from '../api.js';
 import { SLOTS, slotLabel, todayInIndia, validateReading } from '../readings.js';
@@ -7,9 +8,13 @@ const emptyForm = (date) => ({ id: null, date, slot: 'morning', value: '' });
 
 export default function Home() {
   const today = todayInIndia();
-  const [viewDate, setViewDate] = useState(today);
+  // Opened from History as /?date=YYYY-MM-DD: start on that day.
+  const [params] = useSearchParams();
+  const urlDate = params.get('date');
+  const startDate = /^\d{4}-\d{2}-\d{2}$/.test(urlDate ?? '') && urlDate <= today ? urlDate : today;
+  const [viewDate, setViewDate] = useState(startDate);
   const [readings, setReadings] = useState([]);
-  const [form, setForm] = useState(emptyForm(today));
+  const [form, setForm] = useState(emptyForm(startDate));
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
