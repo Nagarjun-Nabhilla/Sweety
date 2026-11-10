@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import Header from '../components/Header.jsx';
 import { api } from '../api.js';
 import { slotLabel } from '../readings.js';
@@ -9,6 +9,7 @@ const fmtDate = (s) =>
   new Date(`${s}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
 
 export default function History() {
+  const navigate = useNavigate();
   const [page, setPage] = useState(1);
   const [data, setData] = useState(null);
   const [error, setError] = useState('');
@@ -57,7 +58,7 @@ export default function History() {
                     <td>{slotLabel(r.slot)}</td>
                     <td>{r.value} mg/dl</td>
                     <td className="actions">
-                      <Link className="small-link" to={`/?date=${r.date}`}>Edit</Link>
+                      <button className="small" onClick={() => navigate(`/?date=${r.date}`)}>Edit</button>
                       <button className="small danger" onClick={() => onDelete(r)}>Delete</button>
                     </td>
                   </tr>

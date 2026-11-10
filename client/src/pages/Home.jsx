@@ -4,8 +4,6 @@ import Header from '../components/Header.jsx';
 import { api } from '../api.js';
 import { SLOTS, slotLabel, todayInIndia, validateReading } from '../readings.js';
 
-const emptyForm = (date) => ({ id: null, date, slot: 'morning', value: '' });
-
 export default function Home() {
   const today = todayInIndia();
   // Opened from History as /?date=YYYY-MM-DD: start on that day.
@@ -14,7 +12,7 @@ export default function Home() {
   const startDate = /^\d{4}-\d{2}-\d{2}$/.test(urlDate ?? '') && urlDate <= today ? urlDate : today;
   const [viewDate, setViewDate] = useState(startDate);
   const [readings, setReadings] = useState([]);
-  const [form, setForm] = useState(emptyForm(startDate));
+  const [form, setForm] = useState(null); // null = modal closed
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -30,15 +28,13 @@ export default function Home() {
     load(viewDate);
   }, [viewDate, load]);
 
-  const resetForm = (date = viewDate) => {
-    setForm(emptyForm(date));
+  const openForm = (f) => {
+    setForm(f);
     setError('');
   };
-
-  const changeViewDate = (date) => {
-    if (!date) return;
-    setViewDate(date);
-    resetForm(date);
+  const closeForm = () => {
+    setForm(null);
+    setError('');
   };
 
   const onChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
@@ -54,7 +50,7 @@ export default function Home() {
       const body = { date: form.date, slot: form.slot, value: form.value };
       if (form.id) await api(`/readings/${form.id}`, { method: 'PUT', body });
       else await api('/readings', { method: 'POST', body });
-      resetForm(form.date);
+      setForm(null);
       if (form.date === viewDate) load(viewDate);
       else setViewDate(form.date); // jump to the day the reading was saved on
     } catch (err) {
@@ -68,7 +64,6 @@ export default function Home() {
     if (!window.confirm(`Delete ${slotLabel(r.slot)} reading (${r.value} mg/dl)?`)) return;
     try {
       await api(`/readings/${r.id}`, { method: 'DELETE' });
-      if (form.id === r.id) resetForm();
       load(viewDate);
     } catch (err) {
       setError(err.message);
@@ -82,8 +77,9 @@ export default function Home() {
       <section className="card wide">
         <label>
           Readings for
-          <input type="date" value={viewDate} max={today} onChange={(e) => changeViewDate(e.target.value)} />
+          <input type="date" value={viewDate} max={today} onChange={(e) => e.target.value && setViewDate(e.target.value)} />
         </label>
+        {!form && error && <p className="error">{error}</p>}
         <table className="readings">
           <tbody>
             {SLOTS.map((s) => {
@@ -95,13 +91,11 @@ export default function Home() {
                   <td className="actions">
                     {r ? (
                       <>
-                        <button className="small" onClick={() => { setForm({ ...r, value: String(r.value) }); setError(''); }}>
-                          Edit
-                        </button>
+                        <button className="small" onClick={() => openForm({ ...r, value: String(r.value) })}>Edit</button>
                         <button className="small danger" onClick={() => onDelete(r)}>Delete</button>
                       </>
                     ) : (
-                      <button className="small" onClick={() => { setForm({ ...emptyForm(viewDate), slot: s.key }); setError(''); }}>
+                      <button className="small" onClick={() => openForm({ id: null, date: viewDate, slot: s.key, value: '' })}>
                         Add
                       </button>
                     )}
@@ -113,32 +107,34 @@ export default function Home() {
         </table>
       </section>
 
-      <section className="card wide">
-        <h2>{form.id ? 'Edit reading' : 'Add reading'}</h2>
-        <form onSubmit={onSubmit} noValidate>
-          <label>
-            Date
-            <input name="date" type="date" value={form.date} max={today} onChange={onChange} />
-          </label>
-          <label>
-            Time slot
-            <select name="slot" value={form.slot} onChange={onChange}>
-              {SLOTS.map((s) => (
-                <option key={s.key} value={s.key}>{s.label}</option>
-              ))}
-            </select>
-          </label>
-          <label>
-            Glucose (mg/dl)
-            <input name="value" type="number" inputMode="decimal" step="0.001" value={form.value} onChange={onChange} />
-          </label>
-          {error && <p className="error">{error}</p>}
-          <button disabled={busy}>{busy ? 'Saving…' : form.id ? 'Update' : 'Save'}</button>
-          {form.id && (
-            <button type="button" className="secondary" onClick={() => resetForm()}>Cancel</button>
-          )}
-        </form>
-      </section>
+      {form && (
+        <div className="modal-backdrop" onClick={closeForm}>
+          <div className="card modal" role="dialog" aria-modal="true" onClick={(e) => e.stopPropagation()}>
+            <h2>{form.id ? 'Edit reading' : 'Add reading'}</h2>
+            <form onSubmit={onSubmit} noValidate>
+              <label>
+                Date
+                <input name="date" type="date" value={form.date} max={today} onChange={onChange} />
+              </label>
+              <label>
+                Time slot
+                <select name="slot" value={form.slot} onChange={onChange}>
+                  {SLOTS.map((s) => (
+                    <option key={s.key} value={s.key}>{s.label}</option>
+                  ))}
+                </select>
+              </label>
+              <label>
+                Glucose (mg/dl)
+                <input name="value" type="number" inputMode="decimal" step="0.001" value={form.value} onChange={onChange} autoFocus />
+              </label>
+              {error && <p className="error">{error}</p>}
+              <button disabled={busy}>{busy ? 'Saving…' : form.id ? 'Update' : 'Save'}</button>
+              <button type="button" className="secondary" onClick={closeForm}>Cancel</button>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
