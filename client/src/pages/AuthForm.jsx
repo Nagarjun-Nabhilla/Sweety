@@ -54,6 +54,7 @@ export default function AuthForm({ mode }) {
         {error && <p className="error">{error}</p>}
         <button disabled={busy}>{busy ? 'Please wait…' : isRegister ? 'Sign up' : 'Log in'}</button>
       </form>
+      {!isRegister && <p><Link to="/forgot-password">Forgot password?</Link></p>}
       <p>
         {isRegister ? 'Have an account? ' : 'New here? '}
         <Link to={isRegister ? '/login' : '/register'}>{isRegister ? 'Log in' : 'Sign up'}</Link>

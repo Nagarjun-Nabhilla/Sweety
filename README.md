@@ -41,6 +41,7 @@ cd ..
    | `PGDATABASE` | Keep this as `sweety`. The seed script runs only against that name. |
    | `JWT_SECRET` | A long random string, used to sign login tokens. |
    | `PORT` | Keep this as `5000`. The client's development proxy expects that port. |
+   | `CLIENT_URL` | Where the client runs, used to build password reset links. The default suits local development. |
 
    To generate a `JWT_SECRET`:
 
@@ -79,6 +80,11 @@ npm run dev
 cd client
 npm run dev
 ```
+
+## Passwords
+
+- **Forgot password:** click **Forgot password?** on the login page and enter your email. This demo doesn't send email, so the reset link is printed in the server's terminal. Open it within 30 minutes. Each link works only once.
+- **Change password:** when logged in, open **Password** in the top menu. You'll need your current password.
 
 ## Tests
 
