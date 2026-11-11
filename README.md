@@ -82,4 +82,18 @@ npm run dev
 
 ## Tests
 
-The project has no automated tests yet, so there is no test command to run.
+The client has tests for the reading form, written with React Testing Library and run with Vitest. They use a fake API, so the server and database don't need to be running.
+
+```
+cd client
+npm test
+```
+
+They check that the form:
+
+- opens with the right time slot
+- rejects empty, decimal and out-of-range values without calling the server
+- saves a valid reading and closes
+- shows server errors and stays open
+- edits an existing reading
+- closes without saving when you click Cancel
