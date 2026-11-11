@@ -126,7 +126,7 @@ export default function Home() {
               </label>
               <label>
                 Glucose (mg/dl)
-                <input name="value" type="number" inputMode="decimal" step="0.001" value={form.value} onChange={onChange} autoFocus />
+                <input name="value" type="number" inputMode="numeric" step="1" value={form.value} onChange={onChange} autoFocus />
               </label>
               {error && <p className="error">{error}</p>}
               <button disabled={busy}>{busy ? 'Saving…' : form.id ? 'Update' : 'Save'}</button>

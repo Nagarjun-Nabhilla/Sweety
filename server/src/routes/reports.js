@@ -21,12 +21,12 @@ function ranges(date) {
   };
 }
 
-// Highest / lowest / average (all rounded to 1 decimal) and count for one user and date range.
+// Highest / lowest (whole numbers), average (rounded to 1 decimal) and count for one user and date range.
 async function stats(userId, [from, to]) {
   const { rows } = await pool.query(
     `SELECT COUNT(*)::int AS count,
-            ROUND(MAX(value), 1) AS highest,
-            ROUND(MIN(value), 1) AS lowest,
+            MAX(value) AS highest,
+            MIN(value) AS lowest,
             ROUND(AVG(value), 1) AS average
      FROM readings
      WHERE user_id = $1 AND reading_date BETWEEN $2 AND $3`,
@@ -49,13 +49,13 @@ router.get('/', async (req, res) => {
     stats(req.userId, r.monthToDate),
     stats(req.userId, r.monthly),
     pool.query(
-      `SELECT slot, ROUND(value, 1) AS value FROM readings
+      `SELECT slot, value FROM readings
        WHERE user_id = $1 AND reading_date = $2
        ORDER BY array_position(ARRAY['morning','after_breakfast','after_lunch','after_dinner'], slot)`,
       [req.userId, date]
     ),
     pool.query(
-      `SELECT reading_date AS date, slot, ROUND(value, 1) AS value FROM readings
+      `SELECT reading_date AS date, slot, value FROM readings
        WHERE user_id = $1 AND reading_date BETWEEN $2 AND $3`,
       [req.userId, r.monthToDate[0], monthEnd]
     ),

@@ -55,7 +55,7 @@ try {
   await client.query('DELETE FROM readings WHERE user_id = $1', [userId]);
   await client.query(
     `INSERT INTO readings (user_id, reading_date, slot, value)
-     SELECT $1, d, s, v FROM unnest($2::date[], $3::text[], $4::numeric[]) AS t(d, s, v)`,
+     SELECT $1, d, s, v FROM unnest($2::date[], $3::text[], $4::int[]) AS t(d, s, v)`,
     [userId, dates, slots, values]
   );
   await client.query('COMMIT');

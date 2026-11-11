@@ -15,8 +15,8 @@ export function validateReading({ value, date }) {
   if (String(value).trim() === '') return 'Please enter a glucose value.';
   const str = String(value).trim();
   const n = Number(str);
-  if (!/^\d+(\.\d+)?$/.test(str) || n < 40 || n > 600) return 'Value must be between 40 and 600 mg/dl.';
-  if (!/^\d+(\.\d{1,3})?$/.test(str)) return 'Value can have at most 3 decimal places.';
+  if (/^\d+\.\d*$/.test(str)) return 'Value must be a whole number.';
+  if (!/^\d+$/.test(str) || n < 40 || n > 600) return 'Value must be between 40 and 600 mg/dl.';
   if (!date) return 'Please choose a valid date.';
   if (date > todayInIndia()) return 'Date cannot be in the future.';
   return null;

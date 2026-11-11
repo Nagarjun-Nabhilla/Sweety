@@ -30,6 +30,9 @@ button.secondary { background: #eee; color: #333; }
 .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: .6rem; }
 .stats div { background: #f8f9fc; border-radius: 8px; padding: .6rem; display: grid; gap: .2rem; }
 .stats span { font-size: .8rem; color: #777; }
+.slot-charts { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+.slot-chart { min-width: 0; }
+.slot-chart h3 { font-size: .95rem; margin: 0 0 .4rem; }
 .pager { display: flex; justify-content: space-between; align-items: center; margin-top: 1rem; font-size: .9rem; }
 .modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,.45); display: flex; align-items: center; justify-content: center; padding: 16px; z-index: 10; }
 .card.modal { margin: 0; width: 100%; max-width: 400px; }

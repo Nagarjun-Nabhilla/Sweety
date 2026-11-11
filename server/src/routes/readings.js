@@ -26,10 +26,10 @@ function parseReading(body = {}) {
   }
   const str = String(value).trim();
   const num = Number(str);
-  if (!/^\d+(\.\d+)?$/.test(str) || num < 40 || num > 600) {
+  if (/^\d+\.\d*$/.test(str)) return { error: 'Value must be a whole number.' };
+  if (!/^\d+$/.test(str) || num < 40 || num > 600) {
     return { error: 'Value must be between 40 and 600 mg/dl.' };
   }
-  if (!/^\d+(\.\d{1,3})?$/.test(str)) return { error: 'Value can have at most 3 decimal places.' };
   if (!isValidDate(date)) return { error: 'Please choose a valid date.' };
   if (date > todayInIndia()) return { error: 'Date cannot be in the future.' };
   if (!Object.hasOwn(SLOTS, slot)) return { error: 'Please choose a valid time slot.' };

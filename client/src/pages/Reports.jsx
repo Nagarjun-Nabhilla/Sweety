@@ -7,7 +7,8 @@ import { slotLabel, todayInIndia } from '../readings.js';
 // '2026-10-15' -> '15 Oct 2026'
 const fmtDate = (s) =>
   new Date(`${s}T00:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric', timeZone: 'UTC' });
-const fmtValue = (n) => `${Number(n).toFixed(1)} mg/dl`;
+const fmtValue = (n) => `${n} mg/dl`;
+const fmtAverage = (n) => `${Number(n).toFixed(1)} mg/dl`; // always 1 decimal, e.g. 132.0
 
 function ReportCard({ title, report, children }) {
   const range = report.from === report.to ? fmtDate(report.from) : `${fmtDate(report.from)} – ${fmtDate(report.to)}`;
@@ -22,7 +23,7 @@ function ReportCard({ title, report, children }) {
           <div className="stats">
             <div><span>Highest</span><strong>{fmtValue(report.highest)}</strong></div>
             <div><span>Lowest</span><strong>{fmtValue(report.lowest)}</strong></div>
-            <div><span>Average</span><strong>{fmtValue(report.average)}</strong></div>
+            <div><span>Average</span><strong>{fmtAverage(report.average)}</strong></div>
             <div><span>Readings</span><strong>{report.count}</strong></div>
           </div>
           {children}
