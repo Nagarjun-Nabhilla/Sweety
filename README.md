@@ -103,3 +103,12 @@ They check that the form:
 - shows server errors and stays open
 - edits an existing reading
 - closes without saving when you click Cancel
+
+## Notes
+
+Planned improvements:
+
+- Add doctors and let users book face-to-face consultations
+- A diet plan to help control diabetes
+- Lifestyle change suggestions
+- A better UI
